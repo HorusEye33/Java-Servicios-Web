@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -82,6 +84,29 @@ public class DemoRestService {
 		}
 		eq.addJugador(jg);
 		return ResponseEntity.ok(eq);
+	}
+	
+	@Operation(summary = "Crear equipo", description = "Crear un nuevo equipo", tags = {"DemoRestService"})
+	@PostMapping("/equipos")
+	public @ResponseBody ResponseEntity addEquipo(
+			@Parameter(description = "Id del equipo", required = true, example = "E1", in = ParameterIn.QUERY) 
+				@RequestParam(name = "id") String id,
+			@Parameter(description = "Nombre del equipo", required = true, example = "Rojo", 
+					in = ParameterIn.QUERY)
+				@RequestParam(name = "nombre") String nombre
+			) {
+		if (liga.getEquipos().get(id) == null) {
+			Equipo eq = new Equipo(id, nombre);
+			liga.getEquipos().put(eq.getId(), eq);
+		} else {
+			return ResponseEntity.badRequest().body("El equipo " + id + " ya existe");
+		}
+		Equipo equipoCreado = liga.getEquipos().get(id);
+		if (equipoCreado == null) {
+			return ResponseEntity.internalServerError().body("No se ha podido crear el equipo " + id);
+		} else {
+			return ResponseEntity.ok(equipoCreado);
+		}
 	}
 }
 	
