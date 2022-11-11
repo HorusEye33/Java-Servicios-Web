@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -106,6 +107,20 @@ public class DemoRestService {
 			return ResponseEntity.internalServerError().body("No se ha podido crear el equipo " + id);
 		} else {
 			return ResponseEntity.ok(equipoCreado);
+		}
+	}
+	
+	@Operation(summary = "Suprimir equipo", description = "Suprimir un equipo", tags = {"DemoRestService"})
+	@DeleteMapping("/equipos/{id}")
+	public @ResponseBody ResponseEntity<Equipo> delEquipo(
+			@Parameter(description = "id del equipo", required = true, example = "E1", in = ParameterIn.PATH)
+			@PathVariable(value = "id") String id
+			) {
+		Equipo borrado = liga.getEquipos().remove(id);
+		if (borrado == null) {
+			return ResponseEntity.notFound().build();
+		} else {
+			return ResponseEntity.ok(borrado);
 		}
 	}
 }
